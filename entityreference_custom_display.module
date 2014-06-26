@@ -41,7 +41,6 @@ function entityreference_custom_display_field_widget_settings_form($field, $inst
   $settings = $widget['settings'];
 
   if($widget['type'] == 'custom_display') {
-    //$target_bundle = array_pop($field['settings']['handler_settings']['target_bundles']);
     $target_type = $field['settings']['target_type'];
 
     // Get all view modes in entity type
@@ -125,7 +124,7 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
           '#default_value' => entityreference_custom_display_checkbox_default_value($entity_id, $items),
           '#field_suffix' => '<label class="option" for="' . $frontend_id . '">' . $label . '</label>',
           '#title_display' => 'after',
-          '#suffix' => drupal_render($entity_view),
+          '#suffix' => '<div class="view-mode" data-for="' . $frontend_id . '">' . drupal_render($entity_view) . '</div>',
           '#name' => $name . '[target_id]',
           '#attributes' => array(
             'id' => $frontend_id,
@@ -147,7 +146,7 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
  * @return Array
  *   Default values.
  */
-function entityreference_custom__display_default_values($items) {
+function entityreference_custom_display_default_values($items) {
   $default_values = array();
   foreach($items as $record) {
     $default_values[] = $record['target_id'];
@@ -165,7 +164,7 @@ function entityreference_custom__display_default_values($items) {
 *   Saved items.
 */
 function entityreference_custom_display_checkbox_default_value($entity_id, $items) {
-  $default_values = entityreference_custom__display_default_values($items);
+  $default_values = entityreference_custom_display_default_values($items);
   if(in_array($entity_id, $default_values)) {
     return $entity_id;
   }
