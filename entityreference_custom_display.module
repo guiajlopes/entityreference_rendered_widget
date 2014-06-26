@@ -56,9 +56,9 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
     $entity_type = $instance['entity_type'];
     $entity = isset($element['#entity']) ? $element['#entity'] : NULL;
     $handler = entityreference_get_selection_handler($field, $instance);
+    $view_mode = $widget['settings']['custom_display_fields'];
     // Get all Referenceables Entities
     $all_entities = $handler->getReferencableEntities();
-
     // Build the path of the element.
     $parents_path = $field['field_name'];
     if (!empty($form['#parents'])) {
@@ -71,7 +71,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
       $parents_path .= '[' . $field['field_name'] . ']';
     }
     // Attach checkboxes in element
-    $element += entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items);
+    $element += entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode);
   }
   return $element;
 }
@@ -88,7 +88,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  * @return Array $rows
  *   Array to be added to Element
  */
-function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items) {
+function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode) {
   $delta = 0;
   foreach($all_entities as $bundle => $ids) {
     $ids = array_keys($ids);
@@ -98,7 +98,7 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
       $label = entity_label($entity_type, $entity);
       $name = $parents_path . '[' . $langcode . '][' . $delta . ']';
       $frontend_id = drupal_html_id('edit-' . $parents_path . '-' . $langcode . '-' . $delta);
-      $entity_view = entity_view($entity_type, array($entity), 'teaser');
+      $entity_view = entity_view($entity_type, array($entity), $view_mode);
 
       $rows[] = array(
         'target_id' => array(
