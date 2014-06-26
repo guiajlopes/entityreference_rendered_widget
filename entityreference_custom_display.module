@@ -40,7 +40,7 @@ function entityreference_custom_display_field_widget_settings_form($field, $inst
   $widget = $instance['widget'];
   $settings = $widget['settings'];
 
-  if($widget['type'] == 'custom_display') {
+  if ($widget['type'] == 'custom_display') {
     $target_type = $field['settings']['target_type'];
 
     // Get all view modes in entity type
@@ -65,15 +65,14 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
 
   $widget = $instance['widget'];
 
-  if($widget['type'] == 'custom_display') {
-    // Custom validate function
+  if ($widget['type'] == 'custom_display') {
+    // Custom validate function.
     $element['#element_validate'][] = 'entityreference_custom_display';
 
     $entity_type = $instance['entity_type'];
-    $entity = isset($element['#entity']) ? $element['#entity'] : NULL;
     $handler = entityreference_get_selection_handler($field, $instance);
     $view_mode = $widget['settings']['custom_display_fields'];
-    // Get all Referenceables Entities
+    // Get all Referenceables Entities.
     $all_entities = $handler->getReferencableEntities();
     // Build the path of the element.
     $parents_path = $field['field_name'];
@@ -86,7 +85,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
       }
       $parents_path .= '[' . $field['field_name'] . ']';
     }
-    // Attach checkboxes in element
+    // Attach checkboxes in element.
     $element += entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode);
   }
   return $element;
@@ -95,22 +94,22 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
 /**
  * Return attached checkboxes
  *
- * @param String $entity_type
- * @param Array $all_entities
- * @param String $parents_path
- * @param String $langcode
- * @param Array $items
+ * @param string $entity_type
+ * @param array $all_entities
+ * @param string $parents_path
+ * @param string $langcode
+ * @param array $items
  *
- * @return Array $rows
+ * @return array $rows
  *   Array to be added to Element
  */
 function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode) {
   $delta = 0;
-  foreach($all_entities as $bundle => $ids) {
+  foreach ($all_entities as  $ids) {
     $ids = array_keys($ids);
     // Load entities
     $entities = entity_load($entity_type, $ids);
-    foreach($entities as $entity_id => $entity) {
+    foreach ($entities as $entity_id => $entity) {
       $label = entity_label($entity_type, $entity);
       $name = $parents_path . '[' . $langcode . '][' . $delta . ']';
       $frontend_id = drupal_html_id('edit-' . $parents_path . '-' . $langcode . '-' . $delta);
@@ -140,15 +139,15 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
 /**
  * Get Default values of items
  *
- * @param Array $items
+ * @param array $items
  *   Saved items.
  *
- * @return Array
+ * @return array
  *   Default values.
  */
 function entityreference_custom_display_default_values($items) {
   $default_values = array();
-  foreach($items as $record) {
+  foreach ($items as $record) {
     $default_values[] = $record['target_id'];
   }
   return drupal_map_assoc($default_values);
@@ -158,10 +157,12 @@ function entityreference_custom_display_default_values($items) {
 * Return default value of checkbox
 *
 * @param int $entity_id
-*   Id of current entity
-*
+*   Id of current entity.
 * @param array $items
 *   Saved items.
+*
+* @return int
+*   Default value or 0 if empty.
 */
 function entityreference_custom_display_checkbox_default_value($entity_id, $items) {
   $default_values = entityreference_custom_display_default_values($items);
@@ -185,5 +186,3 @@ function entityreference_custom_display($element, &$form_state, $form) {
     form_set_value($element, $input, $form_state);
   }
 }
-
-
