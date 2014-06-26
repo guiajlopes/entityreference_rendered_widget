@@ -43,7 +43,7 @@ function entityreference_custom_display_field_widget_settings_form($field, $inst
   if ($widget['type'] == 'custom_display') {
     $target_type = $field['settings']['target_type'];
 
-    // Get all view modes in entity type
+    // Get all view modes in entity type.
     $entity_info = entity_get_info($target_type);
     $view_modes = array_keys($entity_info['view modes']);
 
@@ -92,22 +92,27 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
 }
 
 /**
- * Return attached checkboxes
+ * Return attached checkboxes.
  *
  * @param string $entity_type
+ *   String containing the type of entity.
  * @param array $all_entities
+ *   Array containing all entities.
  * @param string $parents_path
+ *   String parents_path.
  * @param string $langcode
+ *   String language.
  * @param array $items
+ *   Array of all marked items.
  *
  * @return array $rows
  *   Array to be added to Element
  */
 function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode) {
   $delta = 0;
-  foreach ($all_entities as  $ids) {
+  foreach ($all_entities as $ids) {
     $ids = array_keys($ids);
-    // Load entities
+    // Load entities.
     $entities = entity_load($entity_type, $ids);
     foreach ($entities as $entity_id => $entity) {
       $label = entity_label($entity_type, $entity);
@@ -137,7 +142,7 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
 }
 
 /**
- * Get Default values of items
+ * Get Default values of items.
  *
  * @param array $items
  *   Saved items.
@@ -154,7 +159,7 @@ function entityreference_custom_display_default_values($items) {
 }
 
 /**
-* Return default value of checkbox
+* Return default value of checkbox.
 *
 * @param int $entity_id
 *   Id of current entity.
@@ -166,7 +171,7 @@ function entityreference_custom_display_default_values($items) {
 */
 function entityreference_custom_display_checkbox_default_value($entity_id, $items) {
   $default_values = entityreference_custom_display_default_values($items);
-  if(in_array($entity_id, $default_values)) {
+  if (in_array($entity_id, $default_values)) {
     return $entity_id;
   }
   return 0;
@@ -182,7 +187,6 @@ function entityreference_custom_display($element, &$form_state, $form) {
   $input = drupal_array_get_nested_value($form_state['input'], $element['#parents']);
 
   if (!empty($input)) {
-    $entity_ids = array();
     form_set_value($element, $input, $form_state);
   }
 }
