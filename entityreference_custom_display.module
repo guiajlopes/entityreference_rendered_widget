@@ -1,5 +1,22 @@
 <?php
 /**
+ * @file
+ * Entityreference Custom Display module.
+ */
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function entityreference_custom_display_entity_info_alter(&$info) {
+  foreach ($info as $entity_type => $data) {
+    $info[$entity_type]['view modes']['entityreference_custom_display'] = array(
+      'label' => t('Entity Custom Display'),
+      'custom settings' => TRUE,
+    );
+  }
+}
+
+/**
  * Implements hook_field_widget_info().
  */
 function entityreference_custom_display_field_widget_info() {
