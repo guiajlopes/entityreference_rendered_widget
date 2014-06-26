@@ -1,0 +1,173 @@
+<?php
+/**
+ * Implements hook_field_widget_info().
+ */
+function entityreference_custom_display_field_widget_info() {
+  $widgets['custom_display'] = array(
+    'label' => t('Custom display'),
+    'description' => t('An custon widget for entityreference'),
+    'field types' => array('entityreference'),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      'default value' => FIELD_BEHAVIOR_NONE,
+    ),
+  );
+
+  return $widgets;
+}
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function entityreference_custom_display_field_widget_settings_form($field, $instance) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'];
+
+  if($widget['type'] == 'custom_display') {
+    //$target_bundle = array_pop($field['settings']['handler_settings']['target_bundles']);
+    $target_type = $field['settings']['target_type'];
+
+    // Get all view modes in entity type
+    $entity_info = entity_get_info($target_type);
+    $view_modes = array_keys($entity_info['view modes']);
+
+    $element['custom_display_fields'] = array(
+      '#type' => 'select',
+      '#title' => t('View mode displayed'),
+      '#options' => drupal_map_assoc($view_modes),
+      '#default_value' => isset($settings['custom_display_fields']) ? $settings['custom_display_fields'] : array(),
+    );
+
+    return $element;
+  }
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function entityreference_custom_display_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  $widget = $instance['widget'];
+
+  if($widget['type'] == 'custom_display') {
+    // Custom validate function
+    $element['#element_validate'][] = 'entityreference_custom_display';
+
+    $entity_type = $instance['entity_type'];
+    $entity = isset($element['#entity']) ? $element['#entity'] : NULL;
+    $handler = entityreference_get_selection_handler($field, $instance);
+    // Get all Referenceables Entities
+    $all_entities = $handler->getReferencableEntities();
+
+    // Build the path of the element.
+    $parents_path = $field['field_name'];
+    if (!empty($form['#parents'])) {
+      $parents = $form['#parents'];
+      $first_parent = array_shift($parents);
+      $parents_path = $first_parent;
+      if (!empty($parents)) {
+        $parents_path .= '[' . implode('][', $parents) . ']';
+      }
+      $parents_path .= '[' . $field['field_name'] . ']';
+    }
+    // Attach checkboxes in element
+    $element += entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items);
+  }
+  return $element;
+}
+
+/**
+ * Return attached checkboxes
+ *
+ * @param String $entity_type
+ * @param Array $all_entities
+ * @param String $parents_path
+ * @param String $langcode
+ * @param Array $items
+ *
+ * @return Array $rows
+ *   Array to be added to Element
+ */
+function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items) {
+  $delta = 0;
+  foreach($all_entities as $bundle => $ids) {
+    $ids = array_keys($ids);
+    // Load entities
+    $entities = entity_load($entity_type, $ids);
+    foreach($entities as $entity_id => $entity) {
+      $label = entity_label($entity_type, $entity);
+      $name = $parents_path . '[' . $langcode . '][' . $delta . ']';
+      $frontend_id = drupal_html_id('edit-' . $parents_path . '-' . $langcode . '-' . $delta);
+      $entity_view = entity_view($entity_type, array($entity), 'teaser');
+
+      $rows[] = array(
+        'target_id' => array(
+          '#type' => 'checkbox',
+          '#delta' => $delta,
+          '#return_value' => $entity_id,
+          '#default_value' => entityreference_custom_display_checkbox_default_value($entity_id, $items),
+          '#field_suffix' => '<label class="option" for="' . $frontend_id . '">' . $label . '</label>',
+          '#title_display' => 'after',
+          '#suffix' => drupal_render($entity_view),
+          '#name' => $name . '[target_id]',
+          '#attributes' => array(
+            'id' => $frontend_id,
+          ),
+        ),
+      );
+      $delta++;
+    }
+  }
+  return $rows;
+}
+
+/**
+ * Get Default values of items
+ *
+ * @param Array $items
+ *   Saved items.
+ *
+ * @return Array
+ *   Default values.
+ */
+function entityreference_custom__display_default_values($items) {
+  $default_values = array();
+  foreach($items as $record) {
+    $default_values[] = $record['target_id'];
+  }
+  return drupal_map_assoc($default_values);
+}
+
+/**
+* Return default value of checkbox
+*
+* @param int $entity_id
+*   Id of current entity
+*
+* @param array $items
+*   Saved items.
+*/
+function entityreference_custom_display_checkbox_default_value($entity_id, $items) {
+  $default_values = entityreference_custom__display_default_values($items);
+  if(in_array($entity_id, $default_values)) {
+    return $entity_id;
+  }
+  return 0;
+}
+
+/**
+ * Validate checkboxes elements
+ *
+ * @see entityreference_custom_display_field_widget_form
+ */
+function entityreference_custom_display($element, &$form_state, $form) {
+  array_pop($element['#parents']);
+  $input = drupal_array_get_nested_value($form_state['input'], $element['#parents']);
+
+  if (!empty($input)) {
+    $entity_ids = array();
+    form_set_value($element, $input, $form_state);
+  }
+}
+
+
