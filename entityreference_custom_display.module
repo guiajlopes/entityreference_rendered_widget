@@ -105,10 +105,10 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  * @param array $items
  *   Array of all marked items.
  *
- * @return array $rows
- *   Array to be added to Element
+ * @return array
+ *   Array to be added to Element.
  */
-function entityreference_custom_display_attach_fields($entity_type, $all_entities = array(), $parents_path, $langcode, $items = array(), $view_mode) {
+function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode) {
   $delta = 0;
   foreach ($all_entities as $ids) {
     $ids = array_keys($ids);
@@ -159,16 +159,16 @@ function entityreference_custom_display_default_values($items = array()) {
 }
 
 /**
-* Return default value of checkbox.
-*
-* @param int $entity_id
-*   Id of current items.
-* @param array $items
-*   Saved items.
-*
-* @return int
-*   Default value or 0 if empty.
-*/
+ * Return default value of checkbox.
+ *
+ * @param int $entity_id
+ *   Id of current items.
+ * @param array $items
+ *   Saved items.
+ *
+ * @return int
+ *   Default value or 0 if empty.
+ */
 function entityreference_custom_display_checkbox_default_value($entity_id, $items = array()) {
   $default_values = entityreference_custom_display_default_values($items);
   if (in_array($entity_id, $default_values)) {
