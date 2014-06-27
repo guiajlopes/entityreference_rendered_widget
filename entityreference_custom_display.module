@@ -67,8 +67,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
 
   if ($widget['type'] == 'custom_display') {
     // Custom validate function.
-    $element['#element_validate'][] = 'entityreference_custom_display';
-
+    $element['#element_validate'][] = 'entityreference_custom_display_validate';
     $entity_type = $instance['entity_type'];
     $handler = entityreference_get_selection_handler($field, $instance);
     $view_mode = $widget['settings']['custom_display_fields'];
@@ -120,6 +119,9 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
       $frontend_id = drupal_html_id('edit-' . $parents_path . '-' . $langcode . '-' . $delta);
       $entity_view = entity_view($entity_type, array($entity), $view_mode);
 
+      $suffix = '<div class="view-mode" data-for="' . $frontend_id . '">';
+      $suffix .= drupal_render($entity_view) . '</div>';
+
       $rows[] = array(
         'target_id' => array(
           '#type' => 'checkbox',
@@ -128,14 +130,14 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
           '#default_value' => entityreference_custom_display_checkbox_default_value($entity_id, $items),
           '#field_suffix' => '<label class="option" for="' . $frontend_id . '">' . $label . '</label>',
           '#title_display' => 'after',
-          '#suffix' => '<div class="view-mode" data-for="' . $frontend_id . '">' . drupal_render($entity_view) . '</div>',
+          '#suffix' => $suffix,
           '#name' => $name . '[target_id]',
           '#attributes' => array(
             'id' => $frontend_id,
           ),
         ),
       );
-      $delta++;
+      ++$delta;
     }
   }
   return $rows;
@@ -179,12 +181,26 @@ function entityreference_custom_display_checkbox_default_value($entity_id, $item
 
 /**
  * Validate checkboxes elements.
- *
- * @see entityreference_custom_display_field_widget_form
  */
-function entityreference_custom_display($element, &$form_state, $form) {
+function entityreference_custom_display_validate($element, &$form_state, $form) {
   array_pop($element['#parents']);
   $input = drupal_array_get_nested_value($form_state['input'], $element['#parents']);
+  // Initial value.
+  $empty = TRUE;
+  $langcode = $form_state['values']['language'];
+  foreach ($input[$langcode] as $values) {
+    if (!empty($values['target_id'])) {
+      $empty = FALSE;
+    }
+  }
+  // Verify if required field.
+  if ($element['#required']) {
+    // Message if field is empty.
+    if ($empty) {
+      $array_error = array('@field' => $element['#title']);
+      form_set_error($element['#field_name'], t('@field is required.', $array_error));
+    }
+  }
 
   if (!empty($input)) {
     form_set_value($element, $input, $form_state);
