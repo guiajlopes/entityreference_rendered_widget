@@ -85,7 +85,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
       $parents_path .= '[' . $field['field_name'] . ']';
     }
     // Attach checkboxes in element.
-    $element += entityreference_custom_display_attach_fields($entity_type, (array) $all_entities, $parents_path, $langcode, (array) $items, $view_mode);
+    $element += entityreference_custom_display_attach_fields($entity_type, $parents_path, $langcode, $view_mode, $items, $all_entities);
   }
   return $element;
 }
@@ -95,19 +95,19 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  *
  * @param string $entity_type
  *   String containing the type of entity.
- * @param array $all_entities
- *   Array containing all entities.
  * @param string $parents_path
  *   String parents_path.
  * @param string $langcode
  *   String language.
  * @param array $items
- *   Array of all marked items.
+ *   (Optional) Array of all marked items.
+ * @param array $all_entities
+ *   (Optional) Array containing all entities.
  *
  * @return array
  *   Array to be added to Element.
  */
-function entityreference_custom_display_attach_fields($entity_type, $all_entities, $parents_path, $langcode, $items, $view_mode) {
+function entityreference_custom_display_attach_fields($entity_type, $parents_path, $langcode, $view_mode, $items = array(), $all_entities = array()) {
   $delta = 0;
   foreach ($all_entities as $ids) {
     $ids = array_keys($ids);
@@ -147,7 +147,7 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
  * Get Default values of items.
  *
  * @param array $items
- *   Saved items.
+ *   (Optional) Saved items.
  *
  * @return array
  *   Default values.
@@ -166,7 +166,7 @@ function entityreference_custom_display_default_values($items = array()) {
  * @param int $entity_id
  *   Id of current items.
  * @param array $items
- *   Saved items.
+ *   (Optional) Saved items.
  *
  * @return int
  *   Default value or 0 if empty.
