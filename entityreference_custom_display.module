@@ -95,13 +95,13 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  *
  * @param string $entity_type
  *   String containing the type of entity.
- * @param array $all_entities
+ * @param $all_entities
  *   Array containing all entities.
  * @param string $parents_path
  *   String parents_path.
  * @param string $langcode
  *   String language.
- * @param array $items
+ * @param $items
  *   Array of all marked items.
  *
  * @return array
@@ -146,7 +146,7 @@ function entityreference_custom_display_attach_fields($entity_type, $all_entitie
 /**
  * Get Default values of items.
  *
- * @param array $items
+ * @param $items
  *   Saved items.
  *
  * @return array
@@ -165,7 +165,7 @@ function entityreference_custom_display_default_values($items = array()) {
  *
  * @param int $entity_id
  *   Id of current items.
- * @param array $items
+ * @param $items
  *   Saved items.
  *
  * @return int
