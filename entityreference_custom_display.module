@@ -66,24 +66,30 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
   $widget = $instance['widget'];
 
   if ($widget['type'] == 'custom_display') {
+    $element['#type'] = 'item';
     // Custom validate function.
     $element['#element_validate'][] = 'entityreference_custom_display_validate';
     $entity_type = $instance['entity_type'];
     $handler = entityreference_get_selection_handler($field, $instance);
     $view_mode = $widget['settings']['custom_display_fields'];
+
     // Get all Referenceables Entities.
     $all_entities = $handler->getReferencableEntities();
+
     // Build the path of the element.
     $parents_path = $field['field_name'];
+
     if (!empty($form['#parents'])) {
       $parents = $form['#parents'];
       $first_parent = array_shift($parents);
       $parents_path = $first_parent;
+
       if (!empty($parents)) {
         $parents_path .= '[' . implode('][', $parents) . ']';
       }
       $parents_path .= '[' . $field['field_name'] . ']';
     }
+
     // Attach checkboxes in element.
     $element += entityreference_custom_display_attach_fields($entity_type, $parents_path, $langcode, $view_mode, $items, $all_entities);
   }
