@@ -24,6 +24,9 @@ function entityreference_custom_display_field_widget_info() {
     'label' => t('Custom display'),
     'description' => t('An custon widget for entityreference'),
     'field types' => array('entityreference'),
+    'settings' => array(
+      'custom_display_fields' => array(),
+    ),
     'behaviors' => array(
       'multiple values' => FIELD_BEHAVIOR_CUSTOM,
       'default value' => FIELD_BEHAVIOR_NONE,
@@ -91,7 +94,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
     }
 
     // Attach checkboxes in element.
-    $element += entityreference_custom_display_attach_fields($entity_type, $parents_path, $langcode, $view_mode, $items, $all_entities);
+    $element += entityreference_custom_display_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
   }
   return $element;
 }
@@ -103,6 +106,8 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  *   String containing the type of entity.
  * @param string $parents_path
  *   String parents_path.
+ * @param array $field
+ *   Array contains field.
  * @param string $langcode
  *   String language.
  * @param array $items
@@ -113,7 +118,8 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  * @return array
  *   Array to be added to Element.
  */
-function entityreference_custom_display_attach_fields($entity_type, $parents_path, $langcode, $view_mode, array $items = array(), array $all_entities = array()) {
+function entityreference_custom_display_attach_fields($entity_type, $parents_path, array $field, $langcode, $view_mode, array $items = array(), array $all_entities = array()) {
+
   $delta = 0;
   foreach ($all_entities as $ids) {
     $ids = array_keys($ids);
@@ -121,16 +127,24 @@ function entityreference_custom_display_attach_fields($entity_type, $parents_pat
     $entities = entity_load($entity_type, $ids);
     foreach ($entities as $entity_id => $entity) {
       $label = entity_label($entity_type, $entity);
-      $name = $parents_path . '[' . $langcode . '][' . $delta . ']';
-      $frontend_id = drupal_html_id('edit-' . $parents_path . '-' . $langcode . '-' . $delta);
+      $name = $parents_path . '[' . $langcode . '][0]';
+      $frontend_id = 'edit-' . $parents_path . '-' . $langcode . '-' . $delta;;
+
       $entity_view = entity_view($entity_type, array($entity), $view_mode);
+      $type = 'radio';
+
+      if ($field['cardinality'] != 1) {
+        // Change type.
+        $type = 'checkbox';
+        $name = $parents_path . '[' . $langcode . '][' . $delta . ']';
+      }
 
       $suffix = '<div class="view-mode" data-for="' . $frontend_id . '">';
       $suffix .= drupal_render($entity_view) . '</div>';
 
-      $rows[] = array(
+      $rows[$delta] = array(
         'target_id' => array(
-          '#type' => 'checkbox',
+          '#type' => $type,
           '#delta' => $delta,
           '#return_value' => $entity_id,
           '#default_value' => entityreference_custom_display_checkbox_default_value($entity_id, $items),
@@ -143,6 +157,7 @@ function entityreference_custom_display_attach_fields($entity_type, $parents_pat
           ),
         ),
       );
+
       ++$delta;
     }
   }
@@ -191,27 +206,36 @@ function entityreference_custom_display_checkbox_default_value($entity_id, array
 function entityreference_custom_display_validate($element, &$form_state, $form) {
   array_pop($element['#parents']);
   $input = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-  // Initial value.
-  $empty = TRUE;
   $langcode = $element['#language'];
-  foreach ($input[$langcode] as $key => $values) {
-    if (!empty($values['target_id'])) {
-      $empty = FALSE;
-    }
-    else {
-      unset($input[$langcode][$key]);
-    }
-  }
-  // Verify if required field.
-  if ($element['#required']) {
-    // Message if field is empty.
-    if ($empty) {
-      $array_error = array('@field' => $element['#title']);
-      form_set_error($element['#field_name'], t('@field is required.', $array_error));
-    }
-  }
+  $field_name = $element['#field_name'];
+  $field = $form_state['field'][$field_name][$langcode]['field'];
 
-  if (!$empty) {
+  if ($field['cardinality'] == 1) {
+    $input[$langcode] = array($input[$langcode][0]);
     form_set_value($element, $input, $form_state);
+  }
+  else {
+    // Initial value.
+    $empty = TRUE;
+    foreach ($input[$langcode] as $key => $values) {
+      if (!empty($values['target_id'])) {
+        $empty = FALSE;
+      }
+      else {
+        unset($input[$langcode][$key]);
+      }
+    }
+
+    // Verify if required field.
+    if ($element['#required']) {
+      // Message if field is empty.
+      if ($empty) {
+        $array_error = array('@field' => $element['#title']);
+        form_set_error($element['#field_name'], t('@field is required.', $array_error));
+      }
+    }
+    if (!$empty) {
+      form_set_value($element, $input, $form_state);
+    }
   }
 }
