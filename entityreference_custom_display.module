@@ -93,8 +93,21 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
       $parents_path .= '[' . $field['field_name'] . ']';
     }
 
+    // Get attached checkboxes in node.
+    $attach = entityreference_custom_display_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
+
+    if (empty($attach)) {
+      // Bundle of entity.
+      $bundle = $instance['bundle'];
+      // Markup if no have results.
+      $element[] = array(
+        '#type' => 'markup',
+        '#markup' => t('There are entities of type @type and bundle @bundle', array('@type' => $entity_type, '@bundle' => $bundle)),
+      );
+      return $element;
+    }
     // Attach checkboxes in element.
-    $element += entityreference_custom_display_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
+    $element += $attach;
   }
   return $element;
 }
@@ -119,6 +132,9 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  *   Array to be added to Element.
  */
 function entityreference_custom_display_attach_fields($entity_type, $parents_path, array $field, $langcode, $view_mode, array $items = array(), array $all_entities = array()) {
+
+  // Define empty array.
+  $rows = array();
 
   $delta = 0;
   foreach ($all_entities as $ids) {
