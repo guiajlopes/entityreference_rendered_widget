@@ -102,7 +102,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
       // Markup if no have results.
       $element[] = array(
         '#type' => 'markup',
-        '#markup' => t('There are entities of type @type and bundle @bundle', array('@type' => $entity_type, '@bundle' => $bundle)),
+        '#markup' => t('There are no entities of type @type and bundle @bundle', array('@type' => $entity_type, '@bundle' => $bundle)),
       );
       return $element;
     }
