@@ -22,7 +22,7 @@ function entityreference_custom_display_entity_info_alter(&$info) {
 function entityreference_custom_display_field_widget_info() {
   $widgets['custom_display'] = array(
     'label' => t('Custom display'),
-    'description' => t('An custon widget for entityreference'),
+    'description' => t('A custon widget for entityreference'),
     'field types' => array('entityreference'),
     'settings' => array(
       'custom_display_fields' => array(),
