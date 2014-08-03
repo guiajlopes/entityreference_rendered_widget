@@ -72,13 +72,13 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
     $element['#type'] = 'item';
     // Custom validate function.
     $element['#element_validate'][] = 'entityreference_custom_display_validate';
-    $entity_type = $instance['entity_type'];
+    $entity_type = $field['settings']['target_type'];
+    $entity_bundles = $field['settings']['handler_settings']['target_bundles'];
     $handler = entityreference_get_selection_handler($field, $instance);
     $view_mode = $widget['settings']['custom_display_fields'];
 
     // Get all Referenceables Entities.
     $all_entities = $handler->getReferencableEntities();
-
     // Build the path of the element.
     $parents_path = $field['field_name'];
 
@@ -97,12 +97,11 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
     $attach = entityreference_custom_display_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
 
     if (empty($attach)) {
-      // Bundle of entity.
-      $bundle = $instance['bundle'];
+      $bundles = implode(',', $entity_bundles);
       // Markup if no have results.
       $element[] = array(
         '#type' => 'markup',
-        '#markup' => t('There are no entities of type @type and bundle @bundle', array('@type' => $entity_type, '@bundle' => $bundle)),
+        '#markup' => t('There are no entities of type @type and bundle @bundles', array('@type' => $entity_type, '@bundles' => $bundles)) ,
       );
       return $element;
     }
