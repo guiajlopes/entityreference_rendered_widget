@@ -7,10 +7,10 @@
 /**
  * Implements hook_entity_info_alter().
  */
-function entityreference_custom_display_entity_info_alter(&$info) {
+function entityreference_rendered_display_entity_info_alter(&$info) {
   foreach ($info as $entity_type => $data) {
-    $info[$entity_type]['view modes']['entityreference_custom_display'] = array(
-      'label' => t('Entity Custom Display'),
+    $info[$entity_type]['view modes']['entityreference_rendered_display'] = array(
+      'label' => t('Entity Reference rendered display'),
       'custom settings' => TRUE,
     );
   }
@@ -19,9 +19,9 @@ function entityreference_custom_display_entity_info_alter(&$info) {
 /**
  * Implements hook_field_widget_info().
  */
-function entityreference_custom_display_field_widget_info() {
-  $widgets['custom_display'] = array(
-    'label' => t('Custom display'),
+function entityreference_rendered_display_field_widget_info() {
+  $widgets['rendered_display'] = array(
+    'label' => t('Rendered display'),
     'description' => t('A custon widget for entityreference'),
     'field types' => array('entityreference'),
     'settings' => array(
@@ -39,11 +39,11 @@ function entityreference_custom_display_field_widget_info() {
 /**
  * Implements hook_field_widget_settings_form().
  */
-function entityreference_custom_display_field_widget_settings_form($field, $instance) {
+function entityreference_rendered_display_field_widget_settings_form($field, $instance) {
   $widget = $instance['widget'];
   $settings = $widget['settings'];
 
-  if ($widget['type'] == 'custom_display') {
+  if ($widget['type'] == 'rendered_display') {
     $target_type = $field['settings']['target_type'];
 
     // Get all view modes in entity type.
@@ -64,14 +64,14 @@ function entityreference_custom_display_field_widget_settings_form($field, $inst
 /**
  * Implements hook_field_widget_form().
  */
-function entityreference_custom_display_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+function entityreference_rendered_display_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 
   $widget = $instance['widget'];
 
-  if ($widget['type'] == 'custom_display') {
+  if ($widget['type'] == 'rendered_display') {
     $element['#type'] = 'item';
     // Custom validate function.
-    $element['#element_validate'][] = 'entityreference_custom_display_validate';
+    $element['#element_validate'][] = 'entityreference_rendered_display_validate';
     $entity_type = $field['settings']['target_type'];
     $entity_bundles = $field['settings']['handler_settings']['target_bundles'];
     $handler = entityreference_get_selection_handler($field, $instance);
@@ -94,7 +94,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
     }
 
     // Get attached checkboxes in node.
-    $attach = entityreference_custom_display_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
+    $attach = entityreference_rendered_display_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
 
     if (empty($attach)) {
       $bundles = implode(',', $entity_bundles);
@@ -130,7 +130,7 @@ function entityreference_custom_display_field_widget_form(&$form, &$form_state, 
  * @return array
  *   Array to be added to Element.
  */
-function entityreference_custom_display_attach_fields($entity_type, $parents_path, array $field, $langcode, $view_mode, array $items = array(), array $all_entities = array()) {
+function entityreference_rendered_display_attach_fields($entity_type, $parents_path, array $field, $langcode, $view_mode, array $items = array(), array $all_entities = array()) {
 
   // Define empty array.
   $rows = array();
@@ -143,7 +143,7 @@ function entityreference_custom_display_attach_fields($entity_type, $parents_pat
     foreach ($entities as $entity_id => $entity) {
       $label = entity_label($entity_type, $entity);
       $name = $parents_path . '[' . $langcode . '][0]';
-      $frontend_id = 'edit-' . $parents_path . '-' . $langcode . '-' . $delta;;
+      $frontend_id = 'edit-' . $parents_path . '-' . $langcode . '-' . $delta;
 
       $entity_view = entity_view($entity_type, array($entity), $view_mode);
       $type = 'radio';
@@ -162,7 +162,7 @@ function entityreference_custom_display_attach_fields($entity_type, $parents_pat
           '#type' => $type,
           '#delta' => $delta,
           '#return_value' => $entity_id,
-          '#default_value' => entityreference_custom_display_checkbox_default_value($entity_id, $items),
+          '#default_value' => entityreference_rendered_display_checkbox_default_value($entity_id, $items),
           '#field_suffix' => '<label class="option" for="' . $frontend_id . '">' . $label . '</label>',
           '#title_display' => 'after',
           '#suffix' => $suffix,
@@ -188,7 +188,7 @@ function entityreference_custom_display_attach_fields($entity_type, $parents_pat
  * @return array
  *   Default values.
  */
-function entityreference_custom_display_default_values(array $items = array()) {
+function entityreference_rendered_display_default_values(array $items = array()) {
   $default_values = array();
   foreach ($items as $record) {
     $default_values[] = $record['target_id'];
@@ -207,8 +207,8 @@ function entityreference_custom_display_default_values(array $items = array()) {
  * @return int
  *   Default value or 0 if empty.
  */
-function entityreference_custom_display_checkbox_default_value($entity_id, array $items = array()) {
-  $default_values = entityreference_custom_display_default_values($items);
+function entityreference_rendered_display_checkbox_default_value($entity_id, array $items = array()) {
+  $default_values = entityreference_rendered_display_default_values($items);
   if (in_array($entity_id, $default_values)) {
     return $entity_id;
   }
@@ -218,7 +218,7 @@ function entityreference_custom_display_checkbox_default_value($entity_id, array
 /**
  * Validate checkboxes elements.
  */
-function entityreference_custom_display_validate($element, &$form_state, $form) {
+function entityreference_rendered_display_validate($element, &$form_state, $form) {
   array_pop($element['#parents']);
   $input = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
   $langcode = $element['#language'];

@@ -17,7 +17,7 @@ This module requires the following modules:
 
 CONFIGURATION
 -------------
-1) In the Field UI for the Entity Reference field select "Custom Display" as
+1) In the Field UI for the Entity Reference field select "Rendered Display" as
 the widget and on the next page select your View mode from the dropdown.
 
 MAINTAINERS
