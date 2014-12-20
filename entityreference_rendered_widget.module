@@ -56,6 +56,16 @@ function entityreference_rendered_widget_field_widget_settings_form($field, $ins
       '#options' => drupal_map_assoc($view_modes),
       '#default_value' => isset($settings['custom_display_fields']) ? $settings['custom_display_fields'] : array(),
     );
+    $element['label_display'] = array(
+      '#type' => 'select',
+      '#title' => t('Label display'),
+      '#options' => array(
+        'before' => 'Before rendered element',
+        'after' => 'After rendered element',
+        'hidden' => 'Hidden',
+      ),
+      '#default_value' => isset($settings['label_display']) ? $settings['label_display'] : 'before',
+    );
 
     return $element;
   }
@@ -92,9 +102,8 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
       }
       $parents_path .= '[' . $field['field_name'] . ']';
     }
-
     // Get attached checkboxes in node.
-    $attach = entityreference_rendered_widget_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities);
+    $attach = entityreference_rendered_widget_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities, $widget['settings']['label_display']);
 
     if (empty($attach)) {
       $bundles = implode(',', $entity_bundles);
@@ -108,6 +117,10 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
     // Attach checkboxes in element.
     $element += $attach;
   }
+
+  // Some basic css to float rendered label
+  drupal_add_css(drupal_get_path('module', 'entityreference_rendered_widget') . '/css/entityreference_rendered_widget.css');
+
   return $element;
 }
 
@@ -130,7 +143,7 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
  * @return array
  *   Array to be added to Element.
  */
-function entityreference_rendered_widget_attach_fields($entity_type, $parents_path, array $field, $langcode, $view_mode, array $items = array(), array $all_entities = array()) {
+function entityreference_rendered_widget_attach_fields($entity_type, $parents_path, array $field, $langcode, $view_mode, array $items = array(), array $all_entities = array(), $label_display = 'before') {
 
   // Define empty array.
   $rows = array();
@@ -141,9 +154,7 @@ function entityreference_rendered_widget_attach_fields($entity_type, $parents_pa
     // Load entities.
     $entities = entity_load($entity_type, $ids);
     foreach ($entities as $entity_id => $entity) {
-      $label = entity_label($entity_type, $entity);
-      $name = $parents_path . '[' . $langcode . '][0]';
-      $frontend_id = 'edit-' . $parents_path . '-' . $langcode . '-' . $delta;
+      $label = $label_display == 'hidden' ? '' : '<div class="entity-label">' . entity_label($entity_type, $entity) . '</div>'; 
 
       $entity_view = entity_view($entity_type, array($entity), $view_mode);
       $type = 'radio';
@@ -151,11 +162,12 @@ function entityreference_rendered_widget_attach_fields($entity_type, $parents_pa
       if ($field['cardinality'] != 1) {
         // Change type.
         $type = 'checkbox';
-        $name = $parents_path . '[' . $langcode . '][' . $delta . ']';
       }
 
-      $suffix = '<div class="view-mode" data-for="' . $frontend_id . '">';
+      $suffix = '<div class="view-mode">';
       $suffix .= drupal_render($entity_view) . '</div>';
+
+      $title = $label_display == 'before' ? $label . $suffix : $suffix . $label;
 
       $rows[$delta] = array(
         'target_id' => array(
@@ -163,13 +175,7 @@ function entityreference_rendered_widget_attach_fields($entity_type, $parents_pa
           '#delta' => $delta,
           '#return_value' => $entity_id,
           '#default_value' => entityreference_rendered_widget_checkbox_default_value($entity_id, $items),
-          '#field_suffix' => '<label class="option" for="' . $frontend_id . '">' . $label . '</label>',
-          '#title_display' => 'after',
-          '#suffix' => $suffix,
-          '#name' => $name . '[target_id]',
-          '#attributes' => array(
-            'id' => $frontend_id,
-          ),
+          '#title' => $title,
         ),
       );
 
