@@ -75,7 +75,6 @@ function entityreference_rendered_widget_field_widget_settings_form($field, $ins
  * Implements hook_field_widget_form().
  */
 function entityreference_rendered_widget_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-
   $widget = $instance['widget'];
 
   if ($widget['type'] == 'rendered_display') {
@@ -84,6 +83,7 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
     $element['#element_validate'][] = 'entityreference_rendered_widget_validate';
     $entity_type = $field['settings']['target_type'];
     $entity_bundles = $field['settings']['handler_settings']['target_bundles'];
+
     $handler = entityreference_get_selection_handler($field, $instance);
     $view_mode = $widget['settings']['custom_display_fields'];
 
@@ -100,8 +100,10 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
       if (!empty($parents)) {
         $parents_path .= '[' . implode('][', $parents) . ']';
       }
+
       $parents_path .= '[' . $field['field_name'] . ']';
     }
+
     // Get attached checkboxes in node.
     $attach = entityreference_rendered_widget_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities, $widget['settings']['label_display']);
 
@@ -112,14 +114,12 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
         '#type' => 'markup',
         '#markup' => t('There are no entities of type @type and bundle @bundles', array('@type' => $entity_type, '@bundles' => $bundles)) ,
       );
+
       return $element;
     }
     // Attach checkboxes in element.
     $element += $attach;
   }
-
-  // Some basic css to float rendered label
-  drupal_add_css(drupal_get_path('module', 'entityreference_rendered_widget') . '/css/entityreference_rendered_widget.css');
 
   return $element;
 }
@@ -154,7 +154,7 @@ function entityreference_rendered_widget_attach_fields($entity_type, $parents_pa
     // Load entities.
     $entities = entity_load($entity_type, $ids);
     foreach ($entities as $entity_id => $entity) {
-      $label = $label_display == 'hidden' ? '' : '<div class="entity-label">' . entity_label($entity_type, $entity) . '</div>'; 
+      $label = $label_display == 'hidden' ? '' : '<div class="entity-label">' . entity_label($entity_type, $entity) . '</div>';
 
       $entity_view = entity_view($entity_type, array($entity), $view_mode);
       $type = 'radio';
@@ -196,9 +196,11 @@ function entityreference_rendered_widget_attach_fields($entity_type, $parents_pa
  */
 function entityreference_rendered_widget_default_values(array $items = array()) {
   $default_values = array();
+
   foreach ($items as $record) {
     $default_values[] = $record['target_id'];
   }
+
   return drupal_map_assoc($default_values);
 }
 
@@ -215,9 +217,11 @@ function entityreference_rendered_widget_default_values(array $items = array()) 
  */
 function entityreference_rendered_widget_checkbox_default_value($entity_id, array $items = array()) {
   $default_values = entityreference_rendered_widget_default_values($items);
+
   if (in_array($entity_id, $default_values)) {
     return $entity_id;
   }
+
   return 0;
 }
 
