@@ -75,6 +75,7 @@ function entityreference_rendered_widget_field_widget_settings_form($field, $ins
  * Implements hook_field_widget_form().
  */
 function entityreference_rendered_widget_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
   $widget = $instance['widget'];
 
   if ($widget['type'] == 'rendered_display') {
@@ -82,7 +83,6 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
     // Custom validate function.
     $element['#element_validate'][] = 'entityreference_rendered_widget_validate';
     $entity_type = $field['settings']['target_type'];
-    $entity_bundles = $field['settings']['handler_settings']['target_bundles'];
 
     $handler = entityreference_get_selection_handler($field, $instance);
     $view_mode = $widget['settings']['custom_display_fields'];
@@ -108,11 +108,22 @@ function entityreference_rendered_widget_field_widget_form(&$form, &$form_state,
     $attach = entityreference_rendered_widget_attach_fields($entity_type, $parents_path, $field, $langcode, $view_mode, $items, $all_entities, $widget['settings']['label_display']);
 
     if (empty($attach)) {
-      $bundles = implode(',', $entity_bundles);
+      // Default entities.
+      $msg = t('There are no entities');
+
+      // When has target bundles.
+      if (isset($field['settings']['handler_settings']['target_bundles'])) {
+        $entity_bundles = $field['settings']['handler_settings']['target_bundles'];
+        $bundles = implode(',', $entity_bundles);
+
+        $params = array('@type' => $entity_type, '@bundles' => $bundles);
+        $msg = t('There are no entities of type @type and bundle @bundles', $params);
+      }
+
       // Markup if no have results.
       $element[] = array(
         '#type' => 'markup',
-        '#markup' => t('There are no entities of type @type and bundle @bundles', array('@type' => $entity_type, '@bundles' => $bundles)) ,
+        '#markup' =>  $msg,
       );
 
       return $element;
