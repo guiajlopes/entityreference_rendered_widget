@@ -265,7 +265,7 @@ function entityreference_rendered_widget_validate($element, &$form_state, $form)
   $input = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
   $langcode = $element['#language'];
   $field_name = $element['#field_name'];
-  $field = $form_state['field'][$field_name][$langcode]['field'];
+  $field = field_info_field($field_name);
 
   if ($field['cardinality'] == 1) {
     $input[$langcode] = array($input[$langcode][0]);
