@@ -1,5 +1,0 @@
-name = Entity Reference Rendered Widget
-description = Implements widget for Rendered Display in Entity Reference
-core = 7.x
-dependencies[] = entityreference
-package = Fields
