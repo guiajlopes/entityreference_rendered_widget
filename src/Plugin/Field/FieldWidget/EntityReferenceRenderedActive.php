@@ -33,7 +33,8 @@ class EntityReferenceRenderedActive extends EntityReferenceRenderedBase {
       ->getViewBuilder($this->targetEntityType);
 
     foreach ($targets as $target) {
-      $element['#options'][$target->id()] = render($view_builder->view($target, $this->getSetting('display_mode'), $target->language()->getId()));
+      $gen_view = $view_builder->view($target, $this->getSetting('display_mode'), $target->language()->getId());
+      $element['#options'][$target->id()] = render($gen_view);
     }
 
     return $element;
