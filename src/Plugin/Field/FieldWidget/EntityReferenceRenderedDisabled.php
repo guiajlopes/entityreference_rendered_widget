@@ -22,19 +22,15 @@ class EntityReferenceRenderedDisabled extends EntityReferenceRenderedBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-
     if (empty($items->get($delta)->getValue()['target_id'])) {
       $element['#markup'] = '<div class="label">' . $element['#title'] . '</div>';
       $element['#markup'] .= '<div>' . $this->t('Value creation for this field is disabled.') . '</div>';
       return $element;
     }
-    else {
-      $target = \Drupal::entityTypeManager()->getStorage($this->targetEntityType)->load($items->get($delta)->getValue()['target_id']);
 
-      $view_builder = \Drupal::entityTypeManager()
-        ->getViewBuilder($target->getEntityTypeId());
-      $element['entity'] = $view_builder->view($target, $this->getSetting('display_mode'), $target->language()->getId());
-    }
+    $target = $this->entityTypeManager->getStorage($this->targetEntityType)->load($items->get($delta)->getValue()['target_id']);
+    $view_builder = $this->entityTypeManager->getViewBuilder($target->getEntityTypeId());
+    $element['entity'] = $view_builder->view($target, $this->getSetting('display_mode'), $target->language()->getId());
 
     return $element;
   }

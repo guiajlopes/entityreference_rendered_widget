@@ -12,7 +12,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
  */
 function entityreference_rendered_widget_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
-    // Main module help for the entityreference_rendered_widget module.
     case 'help.page.entityreference_rendered_widget':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';

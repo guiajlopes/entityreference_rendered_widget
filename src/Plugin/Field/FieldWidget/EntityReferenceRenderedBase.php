@@ -2,14 +2,18 @@
 
 namespace Drupal\entityreference_rendered_widget\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsButtonsWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for widgets provided by this module.
  */
-abstract class EntityReferenceRenderedBase extends OptionsButtonsWidget {
+abstract class EntityReferenceRenderedBase extends OptionsButtonsWidget implements ContainerFactoryPluginInterface {
 
   /**
    * Display modes available for target entity type.
@@ -40,27 +44,57 @@ abstract class EntityReferenceRenderedBase extends OptionsButtonsWidget {
   protected $fieldSettings;
 
   /**
+   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   */
+  protected $entityDisplayRepository;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct($plugin_id,
     $plugin_definition,
     FieldDefinitionInterface $field_definition,
     array $settings,
-    array $third_party_settings) {
+    array $third_party_settings,
+    EntityDisplayRepositoryInterface $entityDisplayRepository,
+    EntityTypeManagerInterface $entityTypeManager) {
 
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->entityDisplayRepository = $entityDisplayRepository;
+    $this->entityTypeManager = $entityTypeManager;
 
-    /** @var \Drupal\Core\Entity\EntityDisplayRepository $edr */
-    $edr = \Drupal::service('entity_display.repository');
     $this->fieldSettings = $this->getFieldSettings();
     $this->targetEntityType = $this->getFieldSetting('target_type');
-    $this->displayModes = $edr->getViewModes($this->targetEntityType);
+    $this->displayModes = $this->entityDisplayRepository->getViewModes($this->targetEntityType);
+    $this->displayModes['default'] = [
+      'label' => 'Default',
+    ];
     $this->labelOptions = [
       'before' => $this->t('Before rendered element'),
       'after' => $this->t('After rendered element'),
       'hidden' => $this->t('Hidden'),
     ];
 
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('entity_display.repository'),
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -80,7 +114,7 @@ abstract class EntityReferenceRenderedBase extends OptionsButtonsWidget {
     $elements = [];
     $settings = $this->settings;
 
-    $modes = ['default' => $this->t('Default')];
+    $modes = [];
     foreach ($this->displayModes as $mode_name => $mode) {
       $modes[$mode_name] = $mode['label'];
     }
