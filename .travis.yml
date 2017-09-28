@@ -10,7 +10,7 @@ php:
 
 env:
   global:
-    - MODULE_NAME="entity_reference_rendered_widget"
+    - MODULE_NAME="entityreference_rendered_widget"
     - DRUPAL_REPO="git://drupalcode.org/project/drupal.git"
     - PHPCS_VERSION="2.7.*"
     - CODER_VERSION="8.2.9"
