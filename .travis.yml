@@ -62,6 +62,7 @@ install:
   # Make sure Drupal can access our module by using a symlink
   - ln -s $PWD/module drupal/modules/$MODULE_NAME
   - cd drupal
+  - composer install
 
 before_script:
   # This fixes a fail when install Drupal.
