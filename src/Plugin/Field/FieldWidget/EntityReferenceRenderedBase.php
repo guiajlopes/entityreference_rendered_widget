@@ -44,11 +44,15 @@ abstract class EntityReferenceRenderedBase extends OptionsButtonsWidget implemen
   protected $fieldSettings;
 
   /**
+   * Entity Display Repository.
+   *
    * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
+   * Entity Type Manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;

@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\entityreference_rendered_widget\Plugin\Field\FieldWidget;
+
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 
