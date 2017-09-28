@@ -1,5 +1,8 @@
 [![Build Status](https://travis-ci.org/guiajlopes/entityreference_rendered_widget.svg?branch=8.x-1.x)](https://travis-ci.org/guiajlopes/entityreference_rendered_widget)
 
+**Important**: The development of this module are moved to github (https://github.com/guiajlopes/entityreference_rendered_widget).
+All the contributions should be made by pull request.
+
 ### CONTENTS OF THIS FILE
 
  * Introduction
