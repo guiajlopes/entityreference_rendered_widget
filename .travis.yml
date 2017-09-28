@@ -75,9 +75,17 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/drupal && drush --yes site-install standard --db-url="mysql://root@127.0.0.1/drupal"
   - cd $TRAVIS_BUILD_DIR/drupal && drush --yes en $MODULE_NAME
 
+  # Export simpletest environment variables
+  - export SIMPLETEST_BASE_URL=http://localhost:8080
+  - export SIMPLETEST_DB=mysql://root:@127.0.0.1/drupal
+
 script:
-  - cd $TRAVIS_BUILD_DIR/drupal
-  - echo "teste"
+  # CodeSniffer
+  #- phpcs --report=full --standard=Drupal --warning-severity=0 $TRAVIS_BUILD_DIR/drupal/modules/$MODULE_NAME --ignore=bin,*.css,gulpfile.js,libraries,modules/contrib,vendor
+
+  # Drupal "SimpleTests" via run-tests.sh
+  #- cd $TRAVIS_BUILD_DIR/drupal
+  #- php core/scripts/run-tests.sh --verbose --color --module $MODULE_NAME --php $(which php) --url http://127.0.0.1:8080
 
 after_success:
   - if [ "$INSPECT" == "1" ]; then cd $TRAVIS_BUILD_DIR/module; fi;
