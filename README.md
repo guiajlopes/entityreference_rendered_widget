@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/guiajlopes/entityreference_rendered_widget.svg?branch=8.x-1.x)](https://travis-ci.org/guiajlopes/entityreference_rendered_widget)
+[![Code Coverage](https://scrutinizer-ci.com/g/guiajlopes/entityreference_rendered_widget/badges/coverage.png?b=8.x-1.x)](https://scrutinizer-ci.com/g/guiajlopes/entityreference_rendered_widget/?branch=8.x-1.x)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 **Important**: The development of this module are moved to github (https://github.com/guiajlopes/entityreference_rendered_widget).
 All the contributions should be made by pull request.
