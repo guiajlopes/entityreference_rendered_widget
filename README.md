@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/guiajlopes/entityreference_rendered_widget.svg?branch=8.x-1.x)](https://travis-ci.org/guiajlopes/entityreference_rendered_widget)
+
 ### CONTENTS OF THIS FILE
 
  * Introduction

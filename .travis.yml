@@ -1,0 +1,29 @@
+language: php
+
+sudo: false
+
+php:
+  - 5.6
+  - 7.0
+  - 7.1
+
+env:
+  global:
+    - MODULE_NAME="entity_reference_rendered_widget"
+
+  script:
+
+  after_success:
+    - eval "$(ssh-agent -s)"; fi;
+    - echo $DRUPAL_ORG_KEY | base64 --decode > drupalorg_key.pem; fi;
+    - chmod 600 drupalorg_key.pem; fi;
+    - ssh-add drupalorg_key.pem; fi;
+    - git fetch --unshallow; fi;
+    - git config --global user.name "guilopes"; fi;
+    - git config --global user.email guiajlopes@gmail.com; fi;
+    - git config --global push.default matching; fi;
+    - git config --global push.followTags true; fi;
+    - echo -e "Host git.drupal.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config; fi;
+    - git remote add drupalorg git@git.drupal.org:project/$MODULE_NAME.git; fi;
+    - git push drupalorg $TRAVIS_BRANCH; fi;
+    - eval "$(ssh-agent -k)"; fi;
