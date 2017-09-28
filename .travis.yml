@@ -80,7 +80,8 @@ before_script:
   - export SIMPLETEST_DB=mysql://root:@127.0.0.1/drupal
 
 script:
-  - echo 'Test'
+  # CodeSniffer
+  - phpcs --report=full --standard=Drupal --warning-severity=0 $TRAVIS_BUILD_DIR/drupal/modules/$MODULE_NAME
 
 after_success:
   - if [ "$INSPECT" == "1" ]; then cd $TRAVIS_BUILD_DIR/module; fi;
