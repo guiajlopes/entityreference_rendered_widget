@@ -33,8 +33,7 @@ mysql:
 
 before_install:
   # Decide if this build is used to push upstream changes to Drupal.org
-  - if [ "$TRAVIS_PHP_VERSION" == "7.0" ] && [ "$DRUPAL_VERSION" == "8.3.x" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export UPSTREAM="1"; else export UPSTREAM="0"; fi;
-  - if [ "$TRAVIS_PHP_VERSION" == "7.0" ] && [ "$DRUPAL_VERSION" == "8.3.x" ] ; then export INSPECT="1"; else export INSPECT="0"; fi;
+  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ] && [ "$DRUPAL_VERSION" == "8.4.x" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export UPSTREAM="1"; else export UPSTREAM="0"; fi;
 
   # Disable xdebug when we do not generate coverage files
   - if [ "$INSPECT" == "0" ]; then phpenv config-rm xdebug.ini; fi;
@@ -86,7 +85,7 @@ script:
   - phpcs --report=full --standard=Drupal --warning-severity=0 $TRAVIS_BUILD_DIR/drupal/modules/$MODULE_NAME
 
 after_success:
-  - if [ "$INSPECT" == "1" ]; then cd $TRAVIS_BUILD_DIR/module; fi;
+  - if [ "$UPSTREAM" == "1" ]; then cd $TRAVIS_BUILD_DIR/module; fi;
   - if [ "$UPSTREAM" == "1" ]; then eval "$(ssh-agent -s)"; fi;
   - if [ "$UPSTREAM" == "1" ]; then echo $DRUPAL_ORG_KEY | base64 --decode > drupalorg_key.pem; fi;
   - if [ "$UPSTREAM" == "1" ]; then chmod 600 drupalorg_key.pem; fi;
