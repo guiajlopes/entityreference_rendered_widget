@@ -29,6 +29,12 @@ class EntityReferenceRenderedDisabled extends EntityReferenceRenderedBase {
     }
 
     $target = $this->entityTypeManager->getStorage($this->targetEntityType)->load($items->get($delta)->getValue()['target_id']);
+    if (!$target) {
+      $element['#markup'] = '<div class="label">' . $element['#title'] . '</div>';
+      $element['#markup'] .= '<div>' . $this->t('Removed.') . '</div>';
+      return $element;
+    }
+
     $view_builder = $this->entityTypeManager->getViewBuilder($target->getEntityTypeId());
     $element['entity'] = $view_builder->view($target, $this->getSetting('display_mode'), $target->language()->getId());
 
