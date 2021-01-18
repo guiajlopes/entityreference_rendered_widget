@@ -1,4 +1,4 @@
-<a href="https://www.patreon.com/bePatron?u=49026293" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+[!Become a Patron!](https://www.patreon.com/bePatron?u=49026293)
 
 [![Build Status](https://travis-ci.org/guiajlopes/entityreference_rendered_widget.svg?branch=8.x-1.x)](https://travis-ci.org/guiajlopes/entityreference_rendered_widget)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/guiajlopes/entityreference_rendered_widget/badges/quality-score.png?b=8.x-1.x)](https://scrutinizer-ci.com/g/guiajlopes/entityreference_rendered_widget/?branch=8.x-1.x)
