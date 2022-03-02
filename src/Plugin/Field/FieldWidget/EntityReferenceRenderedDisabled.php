@@ -4,6 +4,7 @@ namespace Drupal\entityreference_rendered_widget\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Plugin implementation of the 'entity_reference_rendered_disabled' widget.
@@ -38,7 +39,17 @@ class EntityReferenceRenderedDisabled extends EntityReferenceRenderedBase {
     $view_builder = $this->entityTypeManager->getViewBuilder($target->getEntityTypeId());
     $element['entity'] = $view_builder->view($target, $this->getSetting('display_mode'), $target->language()->getId());
 
+    $name = $this->fieldDefinition->getName();
+    static::setWidgetState($form['#parents'], $name, $form_state, ['original_deltas' => [0 => 0]]);
+
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
+    return FALSE;
   }
 
 }
