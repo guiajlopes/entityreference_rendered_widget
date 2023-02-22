@@ -4,5 +4,3 @@ description: Implements widget for Rendered Display in Entity Reference
 core: 8.x
 core_version_requirement: ^8 || ^9
 package: Fields
-dependencies:
-  - entity_reference
